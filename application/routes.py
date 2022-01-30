@@ -35,8 +35,11 @@ def verify():
     resp = twitter.get("account/settings.json")
     args = request.args
     crypto_username = args.get('username')
+    discord = args.get('discord')
     if not crypto_username or len(crypto_username) == 0:
         return jsonify({"error": "Crypto Username not set", }), 403
+    if not discord or len(discord) == 0:
+        return jsonify({"error": "Discord Username not set", }), 403
     twitter_username = resp.json()["screen_name"]
     try:
         url = "https://crypto.com/nft-api/graphql"
@@ -53,6 +56,7 @@ def verify():
         if str(registered_username).lower() == str(twitter_username).lower():
             x = db.session.query(User).get(twitter_username)
             x.cryptoUsername = crypto_username
+            x.discordUsername = discord
             x.isTwitterMatching = True
             db.session.commit()
             return jsonify({"success": "Crypto.org and twitter are matching", }), 200
