@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from flask_dance.contrib.twitter import make_twitter_blueprint
 from flask_sqlalchemy import SQLAlchemy
 
@@ -12,6 +13,7 @@ def init_app():
         api_secret="EP90Ut2kgSLyE6bI9IutCyLS0rF3jYB95s4gMXa59kBBo64Mld",
     )
     app = Flask(__name__, instance_relative_config=False)
+    CORS(app)
     app.config.from_object('config.Config')
     db.init_app(app)
 
