@@ -13,7 +13,7 @@ def init_app():
         api_secret="EP90Ut2kgSLyE6bI9IutCyLS0rF3jYB95s4gMXa59kBBo64Mld",
     )
     app = Flask(__name__, instance_relative_config=False)
-    CORS(app)
+    CORS(app, supports_credentials=True)
     app.config.from_object('config.Config')
     db.init_app(app)
 
