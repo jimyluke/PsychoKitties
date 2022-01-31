@@ -1,10 +1,17 @@
 import uuid
+from dataclasses import dataclass
 
 from . import db
 
 
+@dataclass
 class User(db.Model):
     """Data model for user accounts."""
+    id: int
+    username: str
+    isHolder: bool
+    isTwitterMatching: bool
+    discordUsername: str
 
     __tablename__ = 'psychokitties_users'
     id = db.Column(db.String(100), default=uuid.uuid4.__str__())

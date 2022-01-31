@@ -97,3 +97,13 @@ def verify_holder():
         x.isHolder = False
         db.session.commit()
         return jsonify({"error": "User isn't Holding PsychoKitties NFT", }), 401
+
+
+@app.route("/status")
+def status():
+    if not twitter.authorized:
+        return redirect(url_for("twitter.login"))
+    resp = twitter.get("account/settings.json")
+    twitter_username = resp.json()["screen_name"]
+    x = db.session.query(User).get(twitter_username)
+    return jsonify(x), 200
