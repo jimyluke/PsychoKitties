@@ -110,7 +110,7 @@ def verify_holder():
 @app.route("/status")
 def status():
     if not twitter.authorized:
-        return redirect(url_for("twitter.login"))
+        return jsonify({"error": "Twitter Unauthorized, please authenticate", }), 401
     resp = twitter.get("account/settings.json")
     twitter_username = resp.json()["screen_name"]
     x = db.session.query(User).get(twitter_username)
