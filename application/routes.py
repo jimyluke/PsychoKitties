@@ -10,7 +10,8 @@ from .models import User, db
 
 @app.route("/")
 def index():
-    app.logger.error('testing error log')
+    app.logger.error("Hey")
+    app.logger.error(request.url)
     if not twitter.authorized:
         return redirect(url_for("twitter.login"))
     resp = twitter.get("account/settings.json")
