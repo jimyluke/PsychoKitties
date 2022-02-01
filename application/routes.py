@@ -115,3 +115,10 @@ def status():
     twitter_username = resp.json()["screen_name"]
     x = db.session.query(User).get(twitter_username)
     return jsonify(x), 200
+
+
+@app.route("/logout")
+def logout():
+    resp = redirect("https://www.psychokitties.io/stream")
+    resp.set_cookie('session', '', expires=0)
+    return resp
