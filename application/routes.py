@@ -11,7 +11,6 @@ from .models import User, db
 @app.route("/")
 def index():
     app.logger.error("Hey")
-    app.logger.error(request.url)
     if not twitter.authorized:
         return redirect(url_for("twitter.login"))
     resp = twitter.get("account/settings.json")
@@ -40,8 +39,6 @@ def verify():
     discord = args.get('discord')
     if not crypto_username or len(crypto_username) == 0:
         return jsonify({"error": "Crypto Username not set", }), 403
-    if not discord or len(discord) == 0:
-        return jsonify({"error": "Discord Username not set", }), 403
     twitter_username = resp.json()["screen_name"]
     try:
         url = "https://crypto.com/nft-api/graphql"
@@ -52,9 +49,12 @@ def verify():
         }
 
         response = requests.request("POST", url, headers=headers, data=payload)
+        app.logger.error(response.json())
         registered_username = response.json()['data']['public']['user']['twitterUsername']
         # BYPASS 1
         # if str(registered_username).lower() == str("ugonzo_art").lower():
+        app.logger.error(
+            f"Checking if {str(registered_username).lower()} is equal to {str(twitter_username).lower()} : {str(registered_username).lower() == str(twitter_username).lower()}")
         if str(registered_username).lower() == str(twitter_username).lower():
             x = db.session.query(User).get(twitter_username)
             x.cryptoUsername = crypto_username
@@ -64,7 +64,8 @@ def verify():
             return jsonify({"success": "Crypto.org and twitter are matching", }), 200
         else:
             return jsonify({"error": "Twitter on Crypto.org not matching", }), 401
-    except:
+    except Exception as e:
+        app.logger.error(e)
         return jsonify({"error": "Couldn't fetch data from Crypto.org", }), 400
 
 
@@ -89,8 +90,10 @@ def verify_holder():
         }
 
         response = requests.request("POST", url, headers=headers, data=payload)
-
+        app.logger.error(response.json())
         assets = response.json()['data']['public']['assets']
+        app.logger.error(f"Fetched assets for holder : {len(assets)} , crypto username : {un}")
+
         if len(assets) > 0:
             x.isHolder = True
             db.session.commit()
@@ -100,7 +103,7 @@ def verify_holder():
             db.session.commit()
             return jsonify({"error": "User isn't Holding PsychoKitties NFT", }), 401
     except Exception as e:
-        print(e)
+        app.logger.error(e)
         return jsonify({"error": "Couldn't verify, please try again", }), 501
 
 
