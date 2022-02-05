@@ -30,6 +30,11 @@ class User(db.Model):
     isHolder = db.Column(
         db.Boolean
     )
+    discordId = db.Column(
+        db.Integer
+    )
+    cryptoNumber = db.Column(
+        db.Integer)
 
     def __repr__(self):
         return '<User {}>'.format(self.username)

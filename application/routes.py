@@ -51,6 +51,8 @@ def verify():
         response = requests.request("POST", url, headers=headers, data=payload)
         app.logger.error(response.json())
         registered_username = response.json()['data']['public']['user']['twitterUsername']
+        if str(registered_username).startswith("@"):
+            registered_username = str(registered_username).removeprefix("@")
         # BYPASS 1
         # if str(registered_username).lower() == str("ugonzo_art").lower():
         app.logger.error(
