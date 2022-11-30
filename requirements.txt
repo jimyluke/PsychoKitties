@@ -1,6 +1,13 @@
-Flask==1.1.2
-requests==2.22.0
+urllib3==1.25.11
+Werkzeug==2.0.3
+Flask==2.0.3
+dataclasses==0.6
+requests==2.27.1
+apscheduler==3.9.1
 flask_cors==3.0.10
 flask_dance==5.1.0
 flask_sqlalchemy==2.5.1
-python-dotenv==0.19.2
+pymysql==1.0.2
+python-dotenv==0.20.0
+SQLAlchemy==1.4.32
+itsdangerous==2.1.2

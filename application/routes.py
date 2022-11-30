@@ -1,16 +1,22 @@
 import uuid
+from datetime import datetime, timedelta
+from http.client import BAD_REQUEST
 
 import requests
-from flask import current_app as app, request, jsonify
+from flask import current_app as app, request, jsonify, abort
 from flask import redirect, url_for
 from flask_dance.contrib.twitter import twitter
+from sqlalchemy import func, text
 
-from .models import User, db
+from . import db
+from .scheds import HistoryScheduler
+from .service import search_database
+
+from .models import User, History
 
 
 @app.route("/")
 def index():
-    app.logger.error("Hey")
     if not twitter.authorized:
         return redirect(url_for("twitter.login"))
     resp = twitter.get("account/settings.json")
@@ -23,7 +29,7 @@ def index():
         if not x:
             db.session.add(new_user)
             db.session.commit()
-        return redirect("https://www.psychokitties.io/stream")
+        return redirect("https://www.psychokitties.io/verification")
     else:
         print("Ain't logged in")
         # Redirect to login again
@@ -43,7 +49,10 @@ def verify():
     try:
         url = "https://crypto.com/nft-api/graphql"
         username = crypto_username
-        payload = "{\r\n\t\"operationName\": \"User\",\r\n\t\"variables\": {\r\n\t\t\"id\": \"" + username + "\",\r\n\t\t\"cacheId\": \"getUserQuery-Profile-" + username + "\"\r\n\t},\r\n\t\"query\": \"query User($id: ID!, $cacheId: ID) {   public(cacheId: $cacheId) {     user(id: $id) {       uuid       verified       id       username       bio       displayName       instagramUsername       facebookUsername       twitterUsername       isCreator       canCreateAsset       croWalletAddress       avatar {         url         __typename       }       cover {         url         __typename       }       __typename     }     __typename   } } \"\r\n}"
+        username = str(username).lower()
+        payload = "{\r\n\t\"operationName\": \"User\",\r\n\t\"variables\": {\r\n\t\t\"id\": \"" + str(
+            username).lower() + "\",\r\n\t\t\"cacheId\": \"getUserQuery-Profile-" + str(
+            username).lower() + "\"\r\n\t},\r\n\t\"query\": \"query User($id: ID!, $cacheId: ID) {   public(cacheId: $cacheId) {     user(id: $id) {       uuid       verified       id       username       bio       displayName       instagramUsername       facebookUsername       twitterUsername       isCreator       canCreateAsset       croWalletAddress       avatar {         url         __typename       }       cover {         url         __typename       }       __typename     }     __typename   } } \"\r\n}"
         headers = {
             'content-type': 'application/json',
         }
@@ -121,6 +130,41 @@ def status():
 
 @app.route("/logout")
 def logout():
-    resp = redirect("https://www.psychokitties.io/stream")
+    resp = redirect("https://www.psychokitties.io/verification")
     resp.set_cookie('session', '', expires=0)
     return resp
+
+
+@app.route('/search/', methods=['GET'])
+def search():
+    args = request.args
+    return search_database(args)
+
+
+@app.route('/stats', methods=['GET'])
+def stats():
+    since = datetime.now() - timedelta(hours=1)
+    one_day= datetime.now()-timedelta(hours=24)
+    print(since)
+    top10 = db.session.query(History.croWalletAddress, func.count('*').label('total')).filter(
+        History.held_until > since) \
+        .group_by(History.croWalletAddress).order_by(text('total DESC')).limit(10).all()
+    top10_dict = []
+    for x in top10:
+        top10_dict.append({"wallet":x[0],"total":x[1]})
+    sum_max = db.session.query(func.sum(History.price),func.max(History.price)).all()
+    sum_today =db.session.query(func.sum(History.price),func.max(History.price))\
+        .filter(History.bought_on > one_day)\
+        .filter( History.bought_on < datetime.now())\
+        .all()
+    print(sum_max)
+    print(sum_today)
+    result = {
+        "total_volume":sum_max[0][0],
+        "max_trade":sum_max[0][1],
+        "total_volume_today": sum_today[0][0],
+        "max_trade_today": sum_today[0][1],
+        "leaderboard":top10_dict
+
+    }
+    return jsonify(result), 200

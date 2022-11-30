@@ -3,7 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../AggregatorCrypto/.idea/AggregatorCrypto.iml" filepath="$PROJECT_DIR$/../AggregatorCrypto/.idea/AggregatorCrypto.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Crypto-Sniper/.idea/Crypto-Sniper.iml" filepath="$PROJECT_DIR$/../Crypto-Sniper/.idea/Crypto-Sniper.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/PsychoKitties.iml" filepath="$PROJECT_DIR$/.idea/PsychoKitties.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../binancetrial/.idea/binancetrial.iml" filepath="$PROJECT_DIR$/../binancetrial/.idea/binancetrial.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../PsychoBot/.idea/psychobot.iml" filepath="$PROJECT_DIR$/../PsychoBot/.idea/psychobot.iml" />
     </modules>
   </component>
 </project>

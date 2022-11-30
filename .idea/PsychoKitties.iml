@@ -8,6 +8,9 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="AggregatorCrypto" />
+    <orderEntry type="module" module-name="psychobot" />
+    <orderEntry type="module" module-name="binancetrial" />
+    <orderEntry type="module" module-name="Crypto-Sniper" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Jinja2" />
